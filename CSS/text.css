@@ -1,0 +1,15 @@
+.christmas-text {
+    z-index: 9999; /* 和图片同层级，置顶 */
+    position: absolute;
+    top: 65%; /* 放在图片下方（配合图片top:30%） */
+    left: 50%;
+    transform: translateX(-50%);
+    /* 圣诞风格字体样式 */
+    font-size: 36px;
+    font-weight: bold;
+    color: #ff0000; /* 圣诞红 */
+    text-shadow: 0 0 10px #ffffff, 0 0 20px #ff0000; /* 发光效果 */
+    font-family: "Arial Black", sans-serif; /* 粗体字体 */
+    /* 轻微闪烁动画 */
+    animation: flash 2s infinite alternate;
+}
