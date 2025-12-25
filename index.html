@@ -22,30 +22,24 @@
             top: 65%;
             left: 50%;
             transform: translateX(-50%);
-            /* 使用引入的圣诞专用字体 */
             font-family: "Mountains of Christmas", "Brush Script MT", "Arial Black", cursive, sans-serif;
-            font-size: 48px; /* 放大字号更适配装饰字体 */
-            font-weight: 700; /* 加粗版本的圣诞字体 */
-            /* 圣诞红渐变文字 */
+            font-size: 48px;
+            font-weight: 700;
             background: linear-gradient(120deg, #ff0000, #c71515, #ff4500);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            /* 增强版圣诞阴影 */
             text-shadow: 
                 0 0 5px #ffffff, 
                 0 0 10px #ff0000, 
                 0 0 15px #ff0000,
                 0 0 20px rgba(255, 215, 0, 0.5),
                 2px 2px 3px rgba(0, 0, 0, 0.3);
-            /* 小范围缩放+呼吸闪烁动画 */
             animation: christmasEffect 1s ease-in-out infinite alternate;
-            /* 文字抗锯齿优化 */
             -webkit-font-smoothing: antialiased;
             text-rendering: optimizeLegibility;
         }
 
-        /* 组合动画：缩放+阴影+透明度变化 */
         @keyframes christmasEffect {
             0% {
                 transform: translateX(-50%) scale(1);
@@ -59,7 +53,7 @@
             }
             
             100% {
-                transform: translateX(-50%) scale(1.1); /* 10%小范围缩放 */
+                transform: translateX(-50%) scale(1.1);
                 opacity: 1;
                 text-shadow: 
                     0 0 8px #ffffff, 
@@ -70,12 +64,14 @@
             }
         }
 
-        /* emoji样式 */
+        /* emoji样式 - 优化动画曲线 */
         .emoji {
             position: fixed;
-            pointer-events: none; /* 不影响点击交互 */
+            pointer-events: none;
             z-index: 1000;
-            transition: transform 3s ease-in;
+            font-size: 24px;
+            /* 使用重力模拟的动画曲线：先慢后快 */
+            transition: transform 1.8s cubic-bezier(0.18, 0.89, 0.32, 1.28);
         }
 </style>
 <body>
@@ -86,7 +82,6 @@
 
         <!--背景音乐标签 -->
     <audio id="bg-music" loop preload="auto">
-        <!-- 替换成你的音乐文件路径，支持 mp3/ogg 格式 -->
         <source src="素材库/铃儿响叮当.mp3" type="audio/mpeg">
 
     <script>
@@ -106,19 +101,15 @@
         }
         setInterval(createSnowflake, 50);
 
-        // 页面加载后自动播放音乐（兼容浏览器限制）
         window.onload = function() {
             const music = document.getElementById('bg-music');
-            // 步骤1：先静音自动播放（绕过大部分浏览器限制）
             music.muted = true;
             music.play().then(() => {
-                // 步骤2：播放成功后，自动取消静音
                 setTimeout(() => {
                     music.muted = false;
                 }, 1000);
             }).catch(err => {
                 console.log('自动播放失败，请点击页面任意位置播放');
-                // 备选方案：用户点击页面后播放
                 document.addEventListener('click', () => {
                     music.play();
                     music.muted = false;
@@ -127,9 +118,9 @@
         };
 
         // 圣诞相关emoji列表
-        const emojis = ['🎄', '🎅', '🎁', '🦌', '❄️', '🌟', '🍪', '🕯️', '🔔', '🎶'];
+        const emojis = ['🎄', '🎅', '🎁', '🦌', '❄️', '🌟', '🍪', '🕯️', '🔔'];
 
-        // 创建emoji函数
+        // 创建emoji函数 - 自然跳跃掉落效果
         function createEmoji(x, y) {
             const emoji = document.createElement('div');
             emoji.classList.add('emoji');
@@ -138,29 +129,41 @@
             emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
             
             // 随机大小
-            const size = Math.random() * 20 + 24; // 24-44px
+            const size = Math.random() * 20 + 24;
             emoji.style.fontSize = `${size}px`;
             
-            // 位置设置为点击位置
+            // 位置设置为点击位置（微调Y轴位置，使动画更自然）
             emoji.style.left = `${x}px`;
             emoji.style.top = `${y}px`;
             
             document.body.appendChild(emoji);
             
-            // 触发下落动画（带旋转和左右偏移）
+            // 分阶段动画：先跳后落
+            // 1. 向上弹跳（小幅度）
             setTimeout(() => {
-                const randomRotate = Math.random() * 360;
-                const randomX = (Math.random() - 0.5) * 200; // 左右随机偏移
-                emoji.style.transform = `translate(${randomX}px, ${window.innerHeight}px) rotate(${randomRotate}deg)`;
-            }, 10);
+                // 随机弹跳高度（15-40px）
+                const jumpHeight = - (Math.random() * 25 + 15);
+                emoji.style.transform = `translateY(${jumpHeight}px)`;
+                
+                // 2. 弹跳后自然掉落（带旋转和轻微左右偏移）
+                setTimeout(() => {
+                    // 随机旋转角度
+                    const rotateAngle = Math.random() * 360;
+                    // 轻微左右偏移（模拟自然下落）
+                    const driftX = (Math.random() - 0.5) * 60;
+                    // 计算掉落距离（到页面底部）
+                    const dropDistance = window.innerHeight - y;
+                    
+                    emoji.style.transform = `translate(${driftX}px, ${dropDistance}px) rotate(${rotateAngle}deg)`;
+                }, 300); // 弹跳持续时间
+            }, 50); // 微小延迟，让动画更流畅
             
             // 动画结束后移除元素
-            setTimeout(() => emoji.remove(), 3000);
+            setTimeout(() => emoji.remove(), 1800);
         }
 
         // 点击页面时生成一个emoji
         document.addEventListener('click', (e) => {
-            // 每次点击只生成一个emoji
             createEmoji(e.clientX, e.clientY);
         });
     </script>
