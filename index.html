@@ -69,6 +69,14 @@
                     2px 2px 4px rgba(0, 0, 0, 0.4);
             }
         }
+
+        /* emoji样式 */
+        .emoji {
+            position: fixed;
+            pointer-events: none; /* 不影响点击交互 */
+            z-index: 1000;
+            transition: transform 3s ease-in;
+        }
 </style>
 <body>
 
@@ -118,18 +126,42 @@
             });
         };
 
+        // 圣诞相关emoji列表
+        const emojis = ['🎄', '🎅', '🎁', '🦌', '❄️', '🌟', '🍪', '🕯️', '🔔', '🎶'];
+
+        // 创建emoji函数
+        function createEmoji(x, y) {
+            const emoji = document.createElement('div');
+            emoji.classList.add('emoji');
+            
+            // 随机选择一个emoji
+            emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            
+            // 随机大小
+            const size = Math.random() * 20 + 24; // 24-44px
+            emoji.style.fontSize = `${size}px`;
+            
+            // 位置设置为点击位置
+            emoji.style.left = `${x}px`;
+            emoji.style.top = `${y}px`;
+            
+            document.body.appendChild(emoji);
+            
+            // 触发下落动画（带旋转和左右偏移）
+            setTimeout(() => {
+                const randomRotate = Math.random() * 360;
+                const randomX = (Math.random() - 0.5) * 200; // 左右随机偏移
+                emoji.style.transform = `translate(${randomX}px, ${window.innerHeight}px) rotate(${randomRotate}deg)`;
+            }, 10);
+            
+            // 动画结束后移除元素
+            setTimeout(() => emoji.remove(), 3000);
+        }
+
+        // 点击页面时生成一个emoji
         document.addEventListener('click', (e) => {
-            const specialFlake = document.createElement('div');
-            specialFlake.classList.add('snowflake');
-            specialFlake.style.width = '15px';
-            specialFlake.style.height = '15px';
-            specialFlake.style.left = `${e.clientX}px`;
-            specialFlake.style.top = `${e.clientY}px`;
-            specialFlake.style.background = 'linear-gradient(white, #f0f8ff)';
-            specialFlake.style.boxShadow = '0 0 10px white';
-            specialFlake.style.animationDuration = '2s';
-            document.body.appendChild(specialFlake);
-            setTimeout(() => specialFlake.remove(), 2000);
+            // 每次点击只生成一个emoji
+            createEmoji(e.clientX, e.clientY);
         });
     </script>
 </body>
